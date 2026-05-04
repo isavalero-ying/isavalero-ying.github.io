@@ -15,7 +15,14 @@ im isa
 
 ## Projects
 
-[Project 1](opioid-proj.pdf) 
+**[Project 1](opioid-proj.pdf)**
 
 I, along with my group members in a data science course, completed a project on opioid prescription use for postpartum patients for our data science course. In this project, we filtered and manipulated a messy data set, created visualisations, and performed statistical tests to see what factors impacted opioid use. 
+
+
+**[Project 2](Project_2.html)**
+
+Does Practice Make Perfect? My group members and I looked into how colour and shape interference impacted performance in a shape matching game called Shapesplosion. We created an experiment and conducted it for an introductory statistics class and analysed their results using a two-way factorial ANOVA model.
+
+
 
