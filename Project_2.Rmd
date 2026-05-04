@@ -1,0 +1,231 @@
+---
+output: 
+  pdf_document:
+    latex_engine: xelatex
+header-includes:
+  - \hyphenpenalty=10000
+  - \exhyphenpenalty=10000
+  - \usepackage{titling}
+  - \usepackage{placeins}
+  - \usepackage{float}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include = F}
+# Read in data from online
+library(dplyr)
+library(ggplot2)
+set_theme(theme_bw())
+data <- read.csv("https://raw.githubusercontent.com/CoBens14/STA_310_Proj2/refs/heads/main/data_project2.csv")
+```
+
+```{r, include = F}
+# Removing all non-necessary observations
+ficc <- data %>% group_by(PlayerID) %>% filter(GroupID == "FICC", ReqTime == 0, Var2 == 2, 
+                                               Var1 %in% c(1, 2, 3, 4), PlayerID != "FICC_1")
+
+# Manually override datapoint to estimate what acutal time should've been
+ficc$Time[ficc$PlayerID == "FICC_4"] <- (60/21) * 3 + 60
+```
+
+```{r, include = F}
+# Create factor variables
+ficc <- ficc %>% mutate(Shapes = factor(ifelse(Var1 %in% c(1, 4), 1, 0), levels = c(0,1)), 
+                        Color = factor(ifelse(Var1 %in% c (2, 4), 1, 0), levels = c(0,1)))
+
+```
+
+```{r, echo = F}
+mod_add <- aov(Time ~ Shapes + Color, data = ficc)
+mod_int <- aov(Time ~ Shapes*Color, data = ficc)
+```
+
+
+```{r, include = F}
+# Create logged time variable
+ficc <- ficc %>% mutate(log_time = log(Time))
+```
+
+```{r, echo = F}
+# Create anova models for log time response
+mod_int_l <- aov(log_time ~ Shapes*Color, data = ficc)
+```
+
+
+\centering
+
+\vspace*{\fill}
+
+# Does Practice Make Perfect? Interference Effect of Shape and Color
+
+Colton Benson, Chris Nguyen, Finn Rowles, Isa Valero Yang
+
+\vspace*{\fill}
+
+\newpage
+
+\raggedright
+
+## Introduction
+
+$\quad$It is widely known that through ordinary experience, practicing a task or game generally improves our performance ability. This is echoed by psychologists; according to Haith and Krakauer, practice can lead to improved skill, habitual behavior, and reduced cognitive load (2018). However, the nature of this practice arguably matters more than the action of practice itself. Our study investigates whether different types of practice can significantly impact player performance in a shape and color matching game, Shapesplosion. In Shapesplosion, the players’ goal is to match a selected number of shapes (15, 18, 21, or 24) to their outline as quickly as possible. The color settings of the game vary; shapes might all have a single randomized matching color, or randomized unmatching colors. This project was inspired by Stroop’s “Studies of Interference in Serial Verbal Reactions” experiment, which investigated cognitive comprehension with colors and reading. Stroop assessed whether cognitive processing speed (a word) would be disrupted by a conflicting secondary stimulus (color), finding that there were slower response times and an increased number of errors in the face of incongruent stimuli (Stroop, 1935). 
+
+$\quad$In order to examine this idea, we posed the question: Does practicing with matching shapes and/or colors improve the time it takes to match shapes in Shapesplosion? To address this question, we performed a two-way factorial experiment, randomly assigning 20 students from an Introductory Applied Statistics course (STA-209) at Grinnell College across four treatment groups which were defined by if their practice round included a full or limited set of shapes (15 or 24) and whether the colors of the shapes were randomized. A second round was then administered with a full set of shapes and random colors. We measured performance on the time taken in seconds to complete the game. Our results suggest there is no significant difference in performance in the second round between practicing with a varying number of shapes and/or randomized colors. 
+
+
+
+## Methods
+
+$\quad$Data was collected from 20 students who were randomly assigned one of four treatment groups through shuffled notecards with specific instructions for their given treatment. The response variable of interest is the time taken to match 24 shapes of random color after completing a practice round. Two treatment factors were manipulated in the practice round: Factor 1 is whether the practice included randomized colors and Factor 2 is whether the practice included 15 or 24 shapes.
+
+\begin{centering}
+
+Group 1: Matching color × 24 shapes
+
+Group 2: Random color × 15 shapes
+
+Group 3: Matching color × 15 shapes
+
+Group 4: Random color × 24 shapes
+
+\end{centering}
+
+$\quad$The practice round was limited to 60 seconds due to time constraints and each player completed the game under their assigned conditions. In the second round, all students completed the Shapesplosion game with unlimited time under the same conditions: randomized color and 24 shapes. Only the time recorded from the second round was used in the data analysis. 
+
+The model of choice is a robust two-way factorial ANOVA model of the form:
+$$ Y  = \mu + \alpha_i + \beta_j + \eta_{i,j} + \epsilon$$
+$\quad$Y is the recorded completion time, $\mu$ is the overall average time, $\alpha_i$  is the color practice effect, with i indicating whether there was color practice or not. $\beta_j$ is the shape practice effect, with j indicating the partial set of 15 shapes (0) or a complete set of 24 shapes (1). $\eta_{i,j}$ is the interaction effect that accounts for both variables.  
+
+$\quad$Certain conditions must be satisfied in order for the ANOVA to produce valid and reliable results. Observations must be independent and this is supported by the random assignment of treatments to the players. Additionally, the residuals must be normally distributed, which we will examine by creating a QQPlot. Lastly, there must be equal variance among the residuals across the four treatment blocks, which we will assess with a residual vs fitted plot. Should these conditions be violated, transformations to the data will be performed and evaluated.
+
+$\quad$During the implementation of the experiment, a few errors occurred. A student accidentally included a 60 second time limit on the last game, but did not finish within the allotted time. The time recorded was 60 seconds with only 21 shapes matched. To remedy this, we extrapolated what their time would have been had they had enough time to complete the game, assuming they maintained their current pace, a reasonable assumption since they had completed over 85% of the game. Additionally, one participant practiced twice before the final game and another participant decided not to complete the final game. Since both of these students were in the same block, the experiment was administered for two additional individuals not taking the STA-209 course to replace these observations. This is an obvious limitation of our data that we must account for when interpreting results. 
+
+
+## Results
+
+$\quad$After estimating the models and prior to interpreting results, we assessed model assumptions outlined in Methods. We did this for all three models mentioned below and found similar results. The QQ Plot displays deviated tails on both ends of the fitted line suggesting the residuals are not normally distributed, but the low sample size makes analysis difficult (Appendix B). The Residuals vs Fitted plot suggests equal variance of the residuals (Figure B). 
+
+
+$\quad$We first fit an additive model using Shapes and Colors as explanatory variables and Time as the response variable. Table 1 indicates that Shapes (p = 0.890) and Colors (p = 0.869) are not statistically significant predictors for Time. The F-values are very small showing little explanatory power. 
+
+```{r, echo = F}
+library(knitr)
+library(broom)
+tidy(mod_add) %>% kable(digits = 3, format = "markdown", col.names = c("Term", "DF", "SSE", "MSE", "F-Statistic", "p-value"), caption = "Additive Model Results")
+```
+
+$\quad$To further examine the relationship between the explanatory variables, we create an interaction plot to assess whether a potential interaction between Shapes and Colors could be present. The plot displays slightly non-parallel lines, which motivates us to test for an interaction (Figure A.1). The second regression model includes an interaction term (Shapes x Colors). The interaction term is not statistically significant (p = 0.963) providing no evidence of an interaction effect (Table 2).
+
+```{r, echo = F}
+tidy(mod_int) %>% kable(digits = 3, format = "markdown", 
+                        col.names = c("Term", "DF", "SSE", "MSE", "F-Statistic", "p-value"), 
+                        caption = "Interaction Model Results")
+```
+
+$\quad$In Table C.1, we estimate the effects. There are small differences between the factor levels (Shapes = +- 0.481 and Colors = +- 0.571), with practice having a negative effect for both factors. The interaction term effect is +-0.166. However, high p-values indicate that none of these effects differ significantly from zero.  Since the mean square value is very large (= 248.56) from Table 2, this indicates that in group variability largely differs in comparison to between groups. 
+
+
+$\quad$We chose to apply a log transformation to the response variable Time, as this slightly improved normality of the residuals. Results can be seen below for the interaction model (Table 3). The results corroborate our initial findings, with Shapes (p = 0.891), Color (p = .785), and the interaction term effects (p = 0.822) not showing evidence of being non-zero. Furthermore, the F-values remain small indicating little explanatory power. 
+
+```{r, echo = F}
+tidy(mod_int_l) %>% kable(digits = 3, format = "markdown", col.names = c("Term", "DF", "SSE", "MSE", "F-Statistic", "p-value"), caption = "Logged Interaction Model Results")
+```
+
+## Discussion
+
+$\quad$Overall, the results of our study suggested that color practice and shape practice did not have a significant impact on the time taken to complete the Shapesplosion game. The treatment groups’ means were all relatively similar, ranging from 72.2 to 74.3 seconds with overlapping standard deviations in each cell. The ANOVA p-values were insignificant for main effects and their interaction. This indicates that exposure to a smaller set of shapes and/or a single color in practice do not inhibit performance when exposed to a new 'conflicting' stimulus, such as a mix of colors and/or new shapes. 
+
+$\quad$While our investigation and analysis did not reveal any treatment effects, there are some important limitations to consider. Firstly, our sample consisted of introductory statistics students at a private liberal arts college. This hinders generalizability, as a convenience sample containing solely undergraduate Grinnell students fails to represent a broader population of interest. While it does provide some insight into the potential lack of effect of differing practice strategies among young, educated college students, we cannot draw conclusions about other demographic groups. For example, there may be a discernible effect for early adolescent students, who have higher neuroplasticity. Reproducing this experiment utilizing a representative sample might reveal distinct performances between blocks. 
+
+$\quad$Another issue that our experiment faced is that while the majority of students followed the intended methodology correctly upon the original administration of the experiment, a few students deviated from the spoken instructions, impacting our results. Thus, modifications had to be made to the data to achieve a balanced experimental design with five observations per block, these experiment-specific limitations ultimately constrain the scope of our analysis.
+
+$\quad$Another limitation is our sample size of 20. The smaller sample size reduces statistical power, increasing the influence of individual variability in game performance. Future research could focus on performing this experiment with a larger sample size of a representative demographic, which would increase statistical power and limit the individual variability that potentially impacted results, while allowing results to be generalizable for the population as a whole. 
+\newpage
+
+## References
+
+\setlength{\parindent}{-0.2in}
+\setlength{\leftskip}{0.2in}
+\setlength{\parskip}{8pt}
+
+\noindent
+
+Haith, A. M., & Krakauer, J. W. (2018). The multiple effects of practice: Skill, habit and reduced cognitive load. Current Opinion in Behavioral Sciences, 20, 196–201. https://doi.org/10.1016/j.cobeha.2018.01.015
+
+
+\noindent
+
+Stat2Labs. 2016. Shapesplosion [Online game]. https://www.stat2games.sites.grinnell.edu/games/shapesplosion.html
+
+
+\noindent
+
+Stroop, J. R. (1935). Studies of interference in serial verbal reactions. Journal of Experimental Psychology, 18(6), 643–662. https://doi.org/10.1037/h0054651
+
+\newpage
+
+## Appendix
+
+### Appendix A: Interaction Plots
+
+#### Figure A.1: Non-Logged Interacton Plot
+
+```{r, echo = F, warning = F, fig.height = 3, fig.width= 4.5}
+# Create group level dataframe
+options(dplyr.summarise.inform = FALSE)
+ficc_factor_level <- ficc %>% group_by(Shapes, Color) %>% 
+  summarize(mean = mean(Time), sd = sd(Time), n = n()) %>% 
+  ungroup()
+
+# Graph Interaction Plot
+ggplot(ficc_factor_level, aes(x = Color, y = mean, color = Shapes, group = Shapes))+
+  geom_point()+
+  geom_line(linetype = "dashed")
+```
+
+### Appendix B: Model Diagnostice Plots
+
+#### Figure B.1: Additive Model Diagnostic Plots
+
+```{r, echo = F, fig.height = 4, fig.width = 7}
+par(mfrow = c(2,2))
+plot(mod_add)
+```
+
+#### Figure B.2: Interaction Model Diagnostic Plots
+
+```{r, echo = F, fig.height = 4, fig.width = 7}
+par(mfrow = c(2,2))
+plot(mod_int)
+```
+
+#### Figure B.3: Logged Interaction Model Diagnostic Plots
+
+```{r, echo = F, fig.height = 4, fig.width = 7}
+par(mfrow = c(2,2))
+plot(mod_int_l)
+```
+
+
+### Appendix C
+
+### Table C.1: Non-Logged Interaction Model Effects
+
+```{r, echo = F}
+tab <- model.tables(mod_int, type = "effects")
+
+sh_effect <- as.data.frame(tab$tables$Shapes) 
+co_effect <- as.data.frame(tab$tables$Color)
+shco_effect <- as.data.frame(tab$tables$`Shapes:Color`)
+
+eff <- rbind(sh_effect, co_effect, shco_effect)
+
+rownames(eff) <- c("No Shape Practice", "Shape Practice", "No Color Practice", "Color Practice", "No Shape and No Color Practice", "Shape, but No Color Practice", "Color, but no Shape Practice", "Shape and Color Practice")
+
+colnames(eff) <- c("Effect")
+
+kable(eff, digits = 3)
+```
