@@ -15,4 +15,4 @@ im sakdjgds
 
 ## Projects
 
-- Chicago Crime Map (https://github.com/isavalero-ying/chicagocrime) i made a map
+- [Chicago Crime Map] (https://github.com/isavalero-ying/chicagocrime) i made a map
