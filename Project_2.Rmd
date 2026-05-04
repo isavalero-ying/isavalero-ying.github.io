@@ -1,13 +1,15 @@
 ---
-output: 
+output:
+  html_document:
+    df_print: paged
   pdf_document:
     latex_engine: xelatex
 header-includes:
-  - \hyphenpenalty=10000
-  - \exhyphenpenalty=10000
-  - \usepackage{titling}
-  - \usepackage{placeins}
-  - \usepackage{float}
+- \hyphenpenalty=10000
+- \exhyphenpenalty=10000
+- \usepackage{titling}
+- \usepackage{placeins}
+- \usepackage{float}
 ---
 
 ```{r setup, include=FALSE}
