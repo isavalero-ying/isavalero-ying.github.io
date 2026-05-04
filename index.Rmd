@@ -15,8 +15,7 @@ im isa
 
 ## Projects
 
-**Project 1**
-(opioid-proj.pdf) 
+[Project 1](opioid-proj.pdf) 
 
 I, along with my group members in a data science course, completed a project on opioid prescription use for postpartum patients for our data science course. In this project, we filtered and manipulated a messy data set, created visualisations, and performed statistical tests to see what factors impacted opioid use. 
 
